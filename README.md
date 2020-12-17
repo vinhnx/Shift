@@ -164,14 +164,8 @@ struct ContentView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 10) {
-            Section(
-                header:
-                    Text(Date().toString.localizedUppercase)
-                    .font(.boldFontWithSize(11))
-            ) {
-                ForEach(eventKitWrapper.events, id: \.self) { event in
-                    WidgetEventRow(event: event)
-                }
+            ForEach(eventKitWrapper.events, id: \.self) { event in
+                Text(event: event)
             }
         }
         .padding()
