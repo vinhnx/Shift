@@ -18,7 +18,7 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 
 **First thing first**: Add Calendar usage description to your app's Info.plist to request for user's Calendars access.
 
-```plist
+```
 <key>NSCalendarsUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs your permission to create events</string>
 ```
