@@ -20,7 +20,7 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 
 ```plist
 <key>NSCalendarsUsageDescription</key>
-	<string>&quot;$(PRODUCT_NAME) needs your permission to create events&quot;</string>
+	<string>$(PRODUCT_NAME) needs your permission to create events</string>
 ```
 
 (Optional) configure own calendar name to request access to, preferrable in `AppDelegate` (Swift) or `App` (SwiftUI):
