@@ -206,8 +206,10 @@ public final class Shift: ObservableObject {
                 let calendars = self.eventStore.calendars(for: .event)
                 let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
                 let events = self.eventStore.events(matching: predicate)
-                self.events = events
-                DispatchQueue.main.async { completion?(.success(events)) }
+                DispatchQueue.main.async { 
+                    self.events = events
+                    completion?(.success(events)) 
+                }
 
             case let .failure(error):
                 DispatchQueue.main.async {
