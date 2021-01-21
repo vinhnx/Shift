@@ -4,7 +4,6 @@
 //
 //  Created by Vinh Nguyen on 24/3/19.
 //  Copyright © 2019 Vinh Nguyen. All rights reserved.
-//
 
 import Foundation
 import SwiftUI
@@ -37,7 +36,7 @@ public final class Shift: ObservableObject {
     @Published public var events = [EKEvent]()
 
     public static var appName: String?
-    
+
     /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
     public private(set) var eventStore = EKEventStore()
 
@@ -170,25 +169,25 @@ public final class Shift: ObservableObject {
 
     /// Fetch events for today
     /// - Parameter completion: completion handler
-    public func fetchEventsForToday(completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
+    public func fetchEventsForToday(filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         let today = Date()
-        fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, completion: completion)
+        fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
     }
 
     /// Fetch events for a specific day
     /// - Parameters:
     ///   - date: day to fetch events from
     ///   - completion: completion handler
-    public func fetchEvents(for date: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
-        fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, completion: completion)
+    public func fetchEvents(for date: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
+        fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
     }
 
     /// Fetch events for a specific day
     /// - Parameters:
     ///   - date: day to fetch events from
     ///   - completion: completion handler
-    public func fetchEventsRangeUntilEndOfDay(from startDate: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
-        fetchEvents(startDate: startDate, endDate: startDate.endOfDay, completion: completion)
+    public func fetchEventsRangeUntilEndOfDay(from startDate: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
+        fetchEvents(startDate: startDate, endDate: startDate.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
     }
 
     /// Fetch events from date range
@@ -196,14 +195,20 @@ public final class Shift: ObservableObject {
     ///   - startDate: start date range
     ///   - endDate: end date range
     ///   - completion: completion handler
-    public func fetchEvents(startDate: Date, endDate: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
+    public func fetchEvents(startDate: Date, endDate: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         requestEventStoreAuthorization { [weak self] result in
             switch result {
             case let .success(status):
                 guard let self = self else { return }
                 guard status == .authorized else { return }
 
-                let calendars = self.eventStore.calendars(for: .event)
+                let calendars = self.eventStore
+                    .calendars(for: .event)
+                    .filter { calendar in
+                        if filterCalendarIDs.isEmpty { return true }
+                        return filterCalendarIDs.contains(calendar.calendarIdentifier)
+                    }
+
                 let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
                 let events = self.eventStore.events(matching: predicate)
                 DispatchQueue.main.async { 
@@ -340,7 +345,7 @@ extension EKEventStore {
             #endif
             return nil
         }
-        
+
         let calendars = self.calendars(for: .event)
 
         if let clendar = calendars.first(where: { $0.title == appName }) {
@@ -351,6 +356,7 @@ extension EKEventStore {
             let newClendar = EKCalendar(for: .event, eventStore: self)
             newClendar.title = appName
             newClendar.source = defaultCalendarForNewEvents?.source
+            newClendar.cgColor = UIColor.red.cgColor
             try? saveCalendar(newClendar, commit: true)
             return newClendar
             #else
@@ -376,6 +382,7 @@ extension Date {
         var components = DateComponents()
         components.day = 1
         components.second = -1
+        // swiftlint:disable:next force_unwrapping
         return Calendar.current.date(byAdding: components, to: startOfDay)!
     }
 }
