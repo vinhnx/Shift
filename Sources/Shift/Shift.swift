@@ -169,6 +169,7 @@ public final class Shift: ObservableObject {
 
     /// Fetch events for today
     /// - Parameter completion: completion handler
+    /// - Parameter filterCalendarIDs: filterable Calendar IDs
     public func fetchEventsForToday(filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         let today = Date()
         fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
@@ -178,6 +179,7 @@ public final class Shift: ObservableObject {
     /// - Parameters:
     ///   - date: day to fetch events from
     ///   - completion: completion handler
+    ///   - filterCalendarIDs: filterable Calendar IDs
     public func fetchEvents(for date: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
     }
@@ -186,6 +188,8 @@ public final class Shift: ObservableObject {
     /// - Parameters:
     ///   - date: day to fetch events from
     ///   - completion: completion handler
+    ///   - startDate: event start date
+    ///   - filterCalendarIDs: filterable Calendar IDs
     public func fetchEventsRangeUntilEndOfDay(from startDate: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         fetchEvents(startDate: startDate, endDate: startDate.endOfDay, filterCalendarIDs: filterCalendarIDs, completion: completion)
     }
@@ -195,6 +199,7 @@ public final class Shift: ObservableObject {
     ///   - startDate: start date range
     ///   - endDate: end date range
     ///   - completion: completion handler
+    ///   - filterCalendarIDs: filterable Calendar IDs
     public func fetchEvents(startDate: Date, endDate: Date, filterCalendarIDs: [String] = [], completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
         requestEventStoreAuthorization { [weak self] result in
             switch result {
@@ -337,8 +342,8 @@ extension EKEventStore {
 
     /// Calendar for current AppName
     /// - Returns: App calendar
-    /// - Parameter name: app name
-    public func calendarForApp() -> EKCalendar? {
+    /// - Parameter calendarColor: default new calendar color
+    public func calendarForApp(calendarColor: CGColor = UIColor.red.cgColor) -> EKCalendar? {
         guard let appName = Shift.appName else {
             #if DEBUG
             print("App name is nil, please config with `Shift.configureWithAppName` in AppDelegate")
