@@ -1,10 +1,3 @@
-//
-//  EventKitWrapper.swift
-//  Clendar
-//
-//  Created by Vinh Nguyen on 24/3/19.
-//  Copyright © 2019 Vinh Nguyen. All rights reserved.
-
 import Foundation
 import SwiftUI
 import EventKit
@@ -106,7 +99,7 @@ public final class Shift: ObservableObject {
         endDate: Date?,
         span: EKSpan = .thisEvent,
         isAllDay: Bool = false,
-        completion: ((Result<EKEvent, ShiftError>) -> Void)?
+        completion: ((Result<EKEvent, Error>) -> Void)?
     ) {
         requestEventStoreAuthorization { [weak self] result in
             switch result {
@@ -216,9 +209,9 @@ public final class Shift: ObservableObject {
 
                 let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
                 let events = self.eventStore.events(matching: predicate)
-                DispatchQueue.main.async { 
+                DispatchQueue.main.async {
                     self.events = events
-                    completion?(.success(events)) 
+                    completion?(.success(events))
                 }
 
             case let .failure(error):
@@ -291,7 +284,7 @@ extension EKEventStore {
         calendar: EKCalendar,
         span: EKSpan = .thisEvent,
         isAllDay: Bool = false,
-        completion: ((Result<EKEvent, ShiftError>) -> Void)?
+        completion: ((Result<EKEvent, Error>) -> Void)?
     ) {
         let event = EKEvent(eventStore: self)
         event.calendar = calendar
@@ -305,7 +298,7 @@ extension EKEventStore {
             DispatchQueue.main.async { completion?(.success(event)) }
         } catch {
             DispatchQueue.main.async {
-                completion?(.failure(ShiftError.mapFromError(error)))
+                completion?(.failure(error))
             }
         }
     }
