@@ -336,7 +336,7 @@ extension EKEventStore {
     /// Calendar for current AppName
     /// - Returns: App calendar
     /// - Parameter calendarColor: default new calendar color
-    public func calendarForApp(calendarColor: CGColor = UIColor.red.cgColor) -> EKCalendar? {
+    public func calendarForApp(calendarColor: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)) -> EKCalendar? {
         guard let appName = Shift.appName else {
             #if DEBUG
             print("App name is nil, please config with `Shift.configureWithAppName` in AppDelegate")
@@ -354,7 +354,7 @@ extension EKEventStore {
             let newClendar = EKCalendar(for: .event, eventStore: self)
             newClendar.title = appName
             newClendar.source = defaultCalendarForNewEvents?.source
-            newClendar.cgColor = UIColor.red.cgColor
+            newClendar.cgColor = .init(red: 1, green: 0, blue: 0, alpha: 1)
             try? saveCalendar(newClendar, commit: true)
             return newClendar
             #else
