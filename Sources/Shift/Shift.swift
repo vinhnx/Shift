@@ -209,13 +209,10 @@ public final class Shift: ObservableObject {
 
                 let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
                 let events = self.eventStore.events(matching: predicate)
-
-                // no need to dispatch queue main async
-                // https://github.com/vinhnx/Clendar/issues/133#issuecomment-803231151
-                // DispatchQueue.main.async {
+                DispatchQueue.main.async {
                     self.events = events
                     completion?(.success(events))
-                // }
+                }
 
             case let .failure(error):
                 DispatchQueue.main.async {
