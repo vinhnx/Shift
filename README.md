@@ -182,6 +182,14 @@ struct ContentView_Previews: PreviewProvider {
 
 ---
 
+### Apps currently using Shift
+
++ [Clendar](https://github.com/vinhnx/Clendar) - Clendar - universal calendar app. Written in SwiftUI. Available on App Store. MIT License.
+
+([add yours here](https://github.com/vinhnx/Laden/pulls))
+
+---
+
 ### Help, feedback or suggestions?
 
 Feel free to [open an issue](https://github.com/vinhnx/Shift/issues) or contact me on [Twitter](https://twitter.com/@vinhnx) for discussions, news & announcements & other projects. 🚀
