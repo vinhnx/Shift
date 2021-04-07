@@ -186,7 +186,7 @@ struct ContentView_Previews: PreviewProvider {
 
 + [Clendar](https://github.com/vinhnx/Clendar) - Clendar - universal calendar app. Written in SwiftUI. Available on App Store. MIT License.
 
-([add yours here](https://github.com/vinhnx/Laden/pulls))
+([add yours here](https://github.com/vinhnx/Shift/pulls))
 
 ---
 
