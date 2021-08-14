@@ -26,6 +26,8 @@ In order to use old Result-based completion hanlders, use tag [0.3.2](https://gi
 
 + iOS version 15 for async/await, tag 0.4.0
 + iOS version 14 and below for Result-based, tag <0.3.2
++ Swift version 5.5
++ Xcode 13
 
 ### Getting Started
 
