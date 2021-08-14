@@ -3,9 +3,9 @@
 
 ---
 
-Shift is a Result-based wrapper for EventKit. SwiftUI supported!
+Shift is a asynchorous wrapper for EventKit. With SwiftUI supported!
 
-### Installation
+### Install
 
 This component is built using Swift Package Manager, it is pretty straight forward to use:
 
@@ -13,6 +13,19 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 2. Paste the repository URL (https://github.com/vinhnx/Shift) and click Next.
 3. For Rules, select Branch (with branch set to master).
 4. Click Finish to resolve package into your Xcode project.
+
+Version:
+
+> async/await pattern is coming soon, in tag [0.4.0](https://github.com/vinhnx/Shift/releases/tag/0.4.0)
+
+https://github.com/vinhnx/Shift/pull/5/files
+
+In order to use old Result-based completion hanlders, use tag [0.3.2](https://github.com/vinhnx/Shift/releases/tag/0.3.2).
+
+### Requirement
+
++ iOS version 15 for async/await, tag 0.4.0
++ iOS version 14 and below for Result-based, tag <0.3.2
 
 ### Getting Started
 
@@ -63,9 +76,26 @@ struct MyApp: App {
 
 ---
 
-### Swift Example
+### Usage Example
 
 Fetch Events:
+
+#### async/await
+
+```swift
+do {
+    let events = try await Shift.shared.fetchEvents(for: Date()) // await for events fetching
+} catch {
+    print(error) // handle error
+}
+```
+
+or, you can ignore event, like so:
+```swift
+let events = try? await Shift.shared.fetchEvents(for: Date()) // await for events fetching
+```
+
+#### Result
 
 ```swift
 Shift.shared.fetchEvents(for: Date()) { result in
@@ -85,43 +115,17 @@ Shift.shared.fetchEventsRangeUntilEndOfDay(from: Date()) { result in
 }
 ```
 
-Various events fetching helpers:
-
-```swift
-    /// Fetch events for today
-    /// - Parameter completion: completion handler
-    public func fetchEventsForToday(completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
-        let today = Date()
-        fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, completion: completion)
-    }
-
-    /// Fetch events for a specific day
-    /// - Parameters:
-    ///   - date: day to fetch events from
-    ///   - completion: completion handler
-    public func fetchEvents(for date: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
-        fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, completion: completion)
-    }
-
-    /// Fetch events for a specific day
-    /// - Parameters:
-    ///   - date: day to fetch events from
-    ///   - completion: completion handler
-    public func fetchEventsRangeUntilEndOfDay(from startDate: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {
-        fetchEvents(startDate: startDate, endDate: startDate.endOfDay, completion: completion)
-    }
-
-    /// Fetch events from date range
-    /// - Parameters:
-    ///   - startDate: start date range
-    ///   - endDate: end date range
-    ///   - completion: completion handler
-    public func fetchEvents(startDate: Date, endDate: Date, completion: ((Result<[EKEvent], ShiftError>) -> Void)? = nil) {...}
-```
-
 ---
 
 Create Event:
+
+#### async/await
+
+```swift
+try? await Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime)
+```
+
+#### Result
 
 ```swift
 Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime) { result in
@@ -135,6 +139,14 @@ Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime) { 
 ---
 
 Delete event:
+
+#### async/await
+
+```swift
+try? await Shift.shared.deleteEvent(identifier: eventID)
+```
+
+### Result
 
 ```swift
 Shift.shared.deleteEvent(identifier: eventID) { result in
@@ -151,7 +163,7 @@ Shift.shared.deleteEvent(identifier: eventID) { result in
 
 Shift is conformed `ObservableObject` with an `@Published` `events` property, so it's straight-forward to use in SwiftUI binding mechanism.
 
-Usage example:
+#### Result-based example:
 
 ```swift
 import EventKit
@@ -172,10 +184,29 @@ struct ContentView: View {
         .onAppear { eventKitWrapper.fetchEventsForToday() }
     }
 }
+```
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+#### async/await example:
+
+```swift
+import EventKit
+import SwiftUI
+import Shift
+
+struct ContentView: View {
+    @StateObject var eventKitWrapper = Shift.shared
+    @State private var selectedEvent: EKEvent?
+
+    var body: some View {
+        LazyVStack(alignment: .leading, spacing: 10) {
+            ForEach(eventKitWrapper.events, id: \.self) { event in
+                Text(event: event)
+            }
+        }
+        .padding()
+        .task { 
+            try? await eventKitWrapper.fetchEventsForToday() 
+        }
     }
 }
 ```
