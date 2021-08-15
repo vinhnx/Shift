@@ -14,16 +14,18 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 
 1. In Xcode (11+), open your project and navigate to File > Swift Packages > Add Package Dependency...
 2. Paste the repository URL (https://github.com/vinhnx/Shift) and click Next.
-3. For Rules, select Branch (with branch set to master).
-4. Click Finish to resolve package into your Xcode project.
+3. For Rules, select Version, in here, you can choose either:
+  + Async/await => tag 0.4.0
+  + Result-based completion handler => tag 0.3.2
+5. Click Finish to resolve package into your Xcode project.
 
-Version:
+![Screen Shot 2021-08-15 at 11 28 54](https://user-images.githubusercontent.com/1097578/129467248-0ceac3c8-56f1-4a67-887f-538283121508.png)
 
-> async/await pattern is coming soon, in tag [0.4.0](https://github.com/vinhnx/Shift/releases/tag/0.4.0)
+### Tag Version:
 
-https://github.com/vinhnx/Shift/pull/5/files
+Async/await pattern is now ready, in tag [0.4.0](https://github.com/vinhnx/Shift/releases/tag/0.4.0)
 
-In order to use old Result-based completion hanlders, use tag [0.3.2](https://github.com/vinhnx/Shift/releases/tag/0.3.2).
+In order to use old Result-based completion hanlders, please use tag [0.3.2](https://github.com/vinhnx/Shift/releases/tag/0.3.2).
 
 ### Requirement
 
