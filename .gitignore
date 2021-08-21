@@ -46,7 +46,7 @@ playground.xcworkspace
 # hence it is not needed unless you have added a package configuration file to your project
 .swiftpm
 .swiftpm/xcode
-.swiftpm/xcode/package.xcworkspace/xcuserdata/Vinh.xcuserdatad/UserInterfaceState.xcuserstate
+.swiftpm/xcode/
 .build/
 
 # CocoaPods

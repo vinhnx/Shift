@@ -34,10 +34,10 @@ public final actor Shift: ObservableObject {
     public static var appName: String?
 
     /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
-    @MainActor public private(set) var eventStore = EKEventStore()
+    public private(set) var eventStore = EKEventStore()
 
     /// Returns calendar object from event kit
-    @MainActor public var defaultCalendar: EKCalendar? {
+    public var defaultCalendar: EKCalendar? {
         eventStore.calendarForApp()
     }
 
@@ -99,7 +99,7 @@ public final actor Shift: ObservableObject {
         span: EKSpan = .thisEvent
     ) async throws {
         try await accessCalendar()
-        try await self.eventStore.deleteEvent(identifier: identifier, span: span)
+        try self.eventStore.deleteEvent(identifier: identifier, span: span)
     }
 #endif
 
@@ -153,13 +153,13 @@ public final actor Shift: ObservableObject {
             throw ShiftError.eventAuthorizationStatus(nil)
         }
 
-        let calendars = self.eventStore.calendars(for: .event).filter { calendar in
+        let calendars = await self.eventStore.calendars(for: .event).filter { calendar in
             if filterCalendarIDs.isEmpty { return true }
             return filterCalendarIDs.contains(calendar.calendarIdentifier)
         }
 
-        let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
-        let events = self.eventStore.events(matching: predicate)
+        let predicate = await self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
+        let events = await self.eventStore.events(matching: predicate)
 
         self.events = events
 
@@ -178,7 +178,7 @@ public final actor Shift: ObservableObject {
             throw ShiftError.eventAuthorizationStatus(nil)
         }
 
-        guard let calendar = await eventStore.calendarForApp() else {
+        guard let calendar = eventStore.calendarForApp() else {
             throw ShiftError.unableToAccessCalendar
         }
 
