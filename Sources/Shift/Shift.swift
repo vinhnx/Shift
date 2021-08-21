@@ -25,19 +25,19 @@ public enum ShiftError: Error, LocalizedError {
 }
 
 /// Swift wrapper for EventKit
-public final class Shift: ObservableObject {
+public final actor Shift: ObservableObject {
 
     // MARK: - Properties
 
-    @Published public var events = [EKEvent]()
+    @MainActor @Published public var events = [EKEvent]()
 
     public static var appName: String?
 
     /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
-    public private(set) var eventStore = EKEventStore()
+    @MainActor public private(set) var eventStore = EKEventStore()
 
     /// Returns calendar object from event kit
-    public var defaultCalendar: EKCalendar? {
+    @MainActor public var defaultCalendar: EKCalendar? {
         eventStore.calendarForApp()
     }
 
@@ -99,7 +99,7 @@ public final class Shift: ObservableObject {
         span: EKSpan = .thisEvent
     ) async throws {
         try await accessCalendar()
-        try self.eventStore.deleteEvent(identifier: identifier, span: span)
+        try await self.eventStore.deleteEvent(identifier: identifier, span: span)
     }
     #endif
 
@@ -145,6 +145,7 @@ public final class Shift: ObservableObject {
     ///   - completion: completion handler
     ///   - filterCalendarIDs: filterable Calendar IDs
     /// Returns: events
+    @MainActor
     @discardableResult
     public func fetchEvents(startDate: Date, endDate: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
         let authorization = try await requestEventStoreAuthorization()
@@ -159,7 +160,9 @@ public final class Shift: ObservableObject {
 
         let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
         let events = self.eventStore.events(matching: predicate)
+
         self.events = events
+
         return events
     }
 
@@ -175,7 +178,7 @@ public final class Shift: ObservableObject {
             throw ShiftError.eventAuthorizationStatus(nil)
         }
 
-        guard let calendar = self.eventStore.calendarForApp() else {
+        guard let calendar = await eventStore.calendarForApp() else {
             throw ShiftError.unableToAccessCalendar
         }
 
