@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import EventKit
 
-    /// ShiftError definition
+/// ShiftError definition
 public enum ShiftError: Error, LocalizedError {
     case mapFromError(Error)
     case unableToAccessCalendar
@@ -11,37 +11,37 @@ public enum ShiftError: Error, LocalizedError {
 
     var localizedDescription: String {
         switch self {
-        case .invalidEvent: return "Invalid event"
-        case .unableToAccessCalendar: return "Unable to access celendar"
-        case let .mapFromError(error): return error.localizedDescription
-        case let .eventAuthorizationStatus(status):
-            if let status = status {
-                return "Failed to authorize event persmissson, status: \(status)"
-            } else {
-                return "Failed to authorize event persmissson"
-            }
+            case .invalidEvent: return "Invalid event"
+            case .unableToAccessCalendar: return "Unable to access celendar"
+            case let .mapFromError(error): return error.localizedDescription
+            case let .eventAuthorizationStatus(status):
+                if let status = status {
+                    return "Failed to authorize event persmissson, status: \(status)"
+                } else {
+                    return "Failed to authorize event persmissson"
+                }
         }
     }
 }
 
-    /// Swift wrapper for EventKit
+/// Swift wrapper for EventKit
 public final actor Shift: ObservableObject {
 
-        // MARK: - Properties
+    // MARK: - Properties
 
     @MainActor @Published public var events = [EKEvent]()
 
     public static var appName: String?
 
-        /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
+    /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
     @MainActor public private(set) var eventStore = EKEventStore()
 
-        /// Returns calendar object from event kit
+    /// Returns calendar object from event kit
     @MainActor public var defaultCalendar: EKCalendar? {
         eventStore.calendarForApp()
     }
 
-        // MARK: Lifecycle
+    // MARK: Lifecycle
 
     public static let shared = Shift()
 
@@ -51,10 +51,10 @@ public final actor Shift: ObservableObject {
 
     private init() {} // This prevents others from using the default '()' initializer for this class.
 
-        // MARK: - Flow
+    // MARK: - Flow
 
-        /// Request event store authorization
-        /// - Returns: EKAuthorizationStatus enum
+    /// Request event store authorization
+    /// - Returns: EKAuthorizationStatus enum
     public func requestEventStoreAuthorization() async throws -> EKAuthorizationStatus {
         let granted = try await requestCalendarAccess()
         if granted {
@@ -65,16 +65,16 @@ public final actor Shift: ObservableObject {
         }
     }
 
-        // MARK: - CRUD
+    // MARK: - CRUD
 
-        /// Create an event
-        /// - Parameters:
-        ///   - title: title of the event
-        ///   - startDate: event's start date
-        ///   - endDate: event's end date
-        ///   - span: event's span
-        ///   - isAllDay: is all day event
-        /// - Returns: created event
+    /// Create an event
+    /// - Parameters:
+    ///   - title: title of the event
+    ///   - startDate: event's start date
+    ///   - endDate: event's end date
+    ///   - span: event's span
+    ///   - isAllDay: is all day event
+    /// - Returns: created event
 #if os(iOS) || os(macOS)
     public func createEvent(
         _ title: String,
@@ -89,10 +89,10 @@ public final actor Shift: ObservableObject {
     }
 #endif
 
-        /// Delete an event
-        /// - Parameters:
-        ///   - identifier: event identifier
-        ///   - span: even't span
+    /// Delete an event
+    /// - Parameters:
+    ///   - identifier: event identifier
+    ///   - span: even't span
 #if os(iOS) || os(macOS)
     public func deleteEvent(
         identifier: String,
@@ -103,48 +103,48 @@ public final actor Shift: ObservableObject {
     }
 #endif
 
-        // MARK: - Fetch Events
+    // MARK: - Fetch Events
 
-        /// Fetch events for today
-        /// - Parameter completion: completion handler
-        /// - Parameter filterCalendarIDs: filterable Calendar IDs
-        /// Returns: events for today
+    /// Fetch events for today
+    /// - Parameter completion: completion handler
+    /// - Parameter filterCalendarIDs: filterable Calendar IDs
+    /// Returns: events for today
     @discardableResult
     public func fetchEventsForToday(filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
         let today = Date()
         return try await fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, filterCalendarIDs: filterCalendarIDs)
     }
 
-        /// Fetch events for a specific day
-        /// - Parameters:
-        ///   - date: day to fetch events from
-        ///   - completion: completion handler
-        ///   - filterCalendarIDs: filterable Calendar IDs
-        /// Returns: events
+    /// Fetch events for a specific day
+    /// - Parameters:
+    ///   - date: day to fetch events from
+    ///   - completion: completion handler
+    ///   - filterCalendarIDs: filterable Calendar IDs
+    /// Returns: events
     @discardableResult
     public func fetchEvents(for date: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
         try await fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, filterCalendarIDs: filterCalendarIDs)
     }
 
-        /// Fetch events for a specific day
-        /// - Parameters:
-        ///   - date: day to fetch events from
-        ///   - completion: completion handler
-        ///   - startDate: event start date
-        ///   - filterCalendarIDs: filterable Calendar IDs
-        /// Returns: events
+    /// Fetch events for a specific day
+    /// - Parameters:
+    ///   - date: day to fetch events from
+    ///   - completion: completion handler
+    ///   - startDate: event start date
+    ///   - filterCalendarIDs: filterable Calendar IDs
+    /// Returns: events
     @discardableResult
     public func fetchEventsRangeUntilEndOfDay(from startDate: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
         try await fetchEvents(startDate: startDate, endDate: startDate.endOfDay, filterCalendarIDs: filterCalendarIDs)
     }
 
-        /// Fetch events from date range
-        /// - Parameters:
-        ///   - startDate: start date range
-        ///   - endDate: end date range
-        ///   - completion: completion handler
-        ///   - filterCalendarIDs: filterable Calendar IDs
-        /// Returns: events
+    /// Fetch events from date range
+    /// - Parameters:
+    ///   - startDate: start date range
+    ///   - endDate: end date range
+    ///   - completion: completion handler
+    ///   - filterCalendarIDs: filterable Calendar IDs
+    /// Returns: events
     @MainActor
     @discardableResult
     public func fetchEvents(startDate: Date, endDate: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
@@ -166,10 +166,10 @@ public final actor Shift: ObservableObject {
         return events
     }
 
-        // MARK: Private
+    // MARK: Private
 
-        /// Request access to calendar
-        /// - Returns: calendar object
+    /// Request access to calendar
+    /// - Returns: calendar object
     @discardableResult
     private func accessCalendar() async throws -> EKCalendar {
         let authorization = try await requestEventStoreAuthorization()
@@ -192,17 +192,17 @@ public final actor Shift: ObservableObject {
 
 extension EKEventStore {
 
-        // MARK: - CRUD
+    // MARK: - CRUD
 
-        /// Create an event
-        /// - Parameters:
-        ///   - title: title of the event
-        ///   - startDate: event's start date
-        ///   - endDate: event's end date
-        ///   - calendar: calendar instance
-        ///   - span: event's span
-        ///   - isAllDay: is all day event
-        /// - Returns: created event
+    /// Create an event
+    /// - Parameters:
+    ///   - title: title of the event
+    ///   - startDate: event's start date
+    ///   - endDate: event's end date
+    ///   - calendar: calendar instance
+    ///   - span: event's span
+    ///   - isAllDay: is all day event
+    /// - Returns: created event
 #if os(iOS) || os(macOS)
     public func createEvent(
         title: String,
@@ -223,10 +223,10 @@ extension EKEventStore {
     }
 #endif
 
-        /// Delete event
-        /// - Parameters:
-        ///   - identifier: event identifier
-        ///   - span: event's span
+    /// Delete event
+    /// - Parameters:
+    ///   - identifier: event identifier
+    ///   - span: event's span
 #if os(iOS) || os(macOS)
     public func deleteEvent(
         identifier: String,
@@ -240,11 +240,11 @@ extension EKEventStore {
     }
 #endif
 
-        // MARK: - Fetch
+    // MARK: - Fetch
 
-        /// Calendar for current AppName
-        /// - Returns: App calendar
-        /// - Parameter calendarColor: default new calendar color
+    /// Calendar for current AppName
+    /// - Returns: App calendar
+    /// - Parameter calendarColor: default new calendar color
     public func calendarForApp(calendarColor: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)) -> EKCalendar? {
         guard let appName = Shift.appName else {
 #if DEBUG
@@ -272,9 +272,9 @@ extension EKEventStore {
         }
     }
 
-        /// Fetch an EKEvent instance with given identifier
-        /// - Parameter identifier: event identifier
-        /// - Returns: an EKEvent instance with given identifier
+    /// Fetch an EKEvent instance with given identifier
+    /// - Parameter identifier: event identifier
+    /// - Returns: an EKEvent instance with given identifier
     func fetchEvent(identifier: String) -> EKEvent? {
         event(withIdentifier: identifier)
     }
@@ -289,7 +289,7 @@ extension Date {
         var components = DateComponents()
         components.day = 1
         components.second = -1
-            // swiftlint:disable:next force_unwrapping
+        // swiftlint:disable:next force_unwrapping
         return Calendar.current.date(byAdding: components, to: startOfDay)!
     }
 }
