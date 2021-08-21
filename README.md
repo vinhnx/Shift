@@ -5,7 +5,8 @@
 
 Shift is a asynchorous wrapper for EventKit:
 + SwiftUI supported
-+ Async/await ready (tag: v0.4.0)
++ Async/await ready (tag: v0.5.0)
++ Thread-safe (with actor).
 + Result completion handler (tag: 0.3.2)
 
 ### Install
@@ -15,7 +16,7 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 1. In Xcode (11+), open your project and navigate to File > Swift Packages > Add Package Dependency...
 2. Paste the repository URL (https://github.com/vinhnx/Shift) and click Next.
 3. For Rules, select Version, in here, you can choose either:
-  + Async/await => tag 0.4.0
+  + Async/await => tag 0.5.0
   + Result-based completion handler => tag 0.3.2
 5. Click Finish to resolve package into your Xcode project.
 
@@ -23,13 +24,13 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 
 ### Tag Version:
 
-Async/await pattern is now ready, in tag [0.4.0](https://github.com/vinhnx/Shift/releases/tag/0.4.0)
+Async/await pattern is now ready, in tag [0.5.0](https://github.com/vinhnx/Shift/releases/tag/0.5.0)
 
 In order to use old Result-based completion hanlders, please use tag [0.3.2](https://github.com/vinhnx/Shift/releases/tag/0.3.2).
 
 ### Requirement
 
-+ iOS version 15 for async/await, tag 0.4.0
++ iOS version 15 for async/await, tag 0.5.0
 + iOS version 14 and below for Result-based, tag <0.3.2
 + Swift version 5.5
 + Xcode 13
