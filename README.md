@@ -3,7 +3,7 @@
 
 ---
 
-Shift is a asynchorous wrapper for EventKit:
+Shift is a async wrapper for EventKit:
 + SwiftUI supported
 + Async/await ready (tag: v0.5.0)
 + Thread-safe (with actor).
