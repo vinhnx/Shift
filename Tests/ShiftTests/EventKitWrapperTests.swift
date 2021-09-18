@@ -3,6 +3,7 @@ import XCTest
 import EventKit
 
 final class ShiftTests: XCTestCase {
+    @available(iOS 15.0, *)
     func testExample() {
         if #available(macOS 12.0, *) {
             Task {
@@ -12,6 +13,7 @@ final class ShiftTests: XCTestCase {
         }
     }
 
+    @available(iOS 15.0, *)
     static var allTests = [
         ("testExample", testExample),
     ]

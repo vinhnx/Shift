@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Shift",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v14),
         .macOS(.v10_15),
         .watchOS(.v6)
     ],

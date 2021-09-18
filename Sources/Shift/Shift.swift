@@ -25,6 +25,7 @@ public enum ShiftError: Error, LocalizedError {
 }
 
 /// Swift wrapper for EventKit
+@available(iOS 15.0.0, *)
 public final actor Shift: ObservableObject {
 
     // MARK: - Properties
@@ -204,6 +205,7 @@ extension EKEventStore {
     ///   - isAllDay: is all day event
     /// - Returns: created event
 #if os(iOS) || os(macOS)
+    @available(iOS 15.0.0, *)
     public func createEvent(
         title: String,
         startDate: Date,
@@ -245,6 +247,7 @@ extension EKEventStore {
     /// Calendar for current AppName
     /// - Returns: App calendar
     /// - Parameter calendarColor: default new calendar color
+    @available(iOS 15.0.0, *)
     public func calendarForApp(calendarColor: CGColor = .init(red: 1, green: 0, blue: 0, alpha: 1)) -> EKCalendar? {
         guard let appName = Shift.appName else {
 #if DEBUG
