@@ -5,13 +5,15 @@ on: [push]
 
 jobs:
     build:
-        runs-on: macos-latest
         strategy:
             matrix:
                 os: [macos-latest]
                 swift: ["5.5"]
+        runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v2
+              with:
+                  swift-version: ${{ matrix.swift }}
             - name: Build
               run: swift build
             - name: Run tests
