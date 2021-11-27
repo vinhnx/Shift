@@ -5,18 +5,21 @@ on:
         branches: [main]
     pull_request:
         branches: [main]
+
+env:
+    swift_package_resolve: swift package resolve
+    swift_build: swift build --build-tests
+    swift_test: swift test
+    cache_version: 1
+
 jobs:
     macOS:
         strategy:
             fail-fast: false
             matrix:
-                xcode: ["13.1", "12.5.1", "12.4"]
+                xcode: ["13.1"]
                 include:
                     - xcode: "13.1"
-                      macos: macOS-11
-                    - xcode: "12.5.1"
-                      macos: macOS-11
-                    - xcode: "12.4"
                       macos: macOS-11
         runs-on: ${{ matrix.macos }}
         name: macOS
@@ -46,23 +49,15 @@ jobs:
               run: ${{ env.swift_build }}
             - name: Test
               run: ${{ env.swift_test }}
-            - name: Scan
-              run: ${{ env.periphery_scan }} --strict
     linux:
         strategy:
             fail-fast: false
             matrix:
-                swift: ["5.5", "5.4", "5.3"]
+                swift: ["5.5"]
                 include:
                     - swift: "5.5"
                       container: "swift:5.5"
                       cache-version: 2
-                    - swift: "5.4"
-                      container: "swift:5.4"
-                      cache-version: 2
-                    - swift: "5.3"
-                      container: "swift:5.3"
-                      cache-version: 1
         runs-on: ubuntu-20.04
         container: ${{ matrix.container }}
         name: Linux
@@ -90,5 +85,3 @@ jobs:
               run: ${{ env.swift_build }} --enable-test-discovery
             - name: Test
               run: ${{ env.swift_test }} --enable-test-discovery
-            - name: Scan
-              run: ${{ env.periphery_scan }} --config .periphery.linux.yml
