@@ -9,8 +9,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - uses: fwal/setup-swift@v1
+            - uses: fwal/setup-swift@v1 #  GitHub Action that setup a Swift environment (https://github.com/fwal/setup-swift)
             - name: Build
               run: swift build
-            - name: Run tests
-              run: swift test
+            # - name: Run tests
+            #   run: swift test
