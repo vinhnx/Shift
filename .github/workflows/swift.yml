@@ -9,15 +9,14 @@ jobs:
         name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]
-                swift: ["5.5", "5.3"]
+                os: [macos-latest]
+                swift: ["5.5"]
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v2
             - uses: fwal/setup-swift@d43a564349d1341cd990cfbd70d94d63b8899475
               with:
-                  swift-version: "5.3.3"
+                  swift-version: ${{ mattrix.swift }}
             - name: Build
-              run: swift build
+            run: swift build
             - name: Run tests
-              run: swift test
+            run: swift test
