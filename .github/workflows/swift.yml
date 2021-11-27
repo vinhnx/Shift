@@ -5,28 +5,12 @@ on: [push]
 
 jobs:
     build:
-        - uses: fwal/setup-swift@v1
-          with:
-              swift-version: "5.1.0"
-        - name: Get swift version
-          run:
-              swift --version # Swift 5.1.0
+        runs-on: macos-latest
 
-
-              # name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
-              # strategy:
-              #     matrix:
-              #         os: [macos-latest]
-              #         swift: ["5.5"]
-              # runs-on: ${{ matrix.os }}
-              # steps:
-              #     - uses: actions/checkout@v2 # checkout
-              #     - uses: fwal/setup-swift@v1 #  GitHub Action that setup a Swift environment (https://github.com/fwal/setup-swift)
-              #     - name: Get swift version
-              #       run: swift --version # Swift 5.5
-              #     - name: Build
-              #       run: swift build
-              #       with:
-              #           swift-version: ${{ matrix.swift }}
-              #     - name: Run tests
-              #       run: swift test
+        steps:
+            - uses: actions/checkout@v2
+            - uses: fwal/setup-swift@v1
+            - name: Build
+              run: swift build
+            - name: Run tests
+              run: swift test
