@@ -1,19 +1,94 @@
 name: Swift
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 jobs:
-  build:
-
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+    macOS:
+        strategy:
+            fail-fast: false
+            matrix:
+                xcode: ["13.1", "12.5.1", "12.4"]
+                include:
+                    - xcode: "13.1"
+                      macos: macOS-11
+                    - xcode: "12.5.1"
+                      macos: macOS-11
+                    - xcode: "12.4"
+                      macos: macOS-11
+        runs-on: ${{ matrix.macos }}
+        name: macOS
+        steps:
+            - uses: actions/checkout@master
+            - name: Select Xcode version
+              run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app; swift -version
+            - name: Get Swift Version
+              id: get-swift-version
+              run: |
+                  echo "::set-output name=version::$(swift -version | head -n 1 | sed s/,// )"
+              shell: bash
+            - name: Cache resolved dependencies
+              id: cache-resolved-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      .build
+                      Package.resolved
+                  key: ${{ runner.os }}-${{ matrix.xcode }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-${{ hashFiles('**/Package.swift', '**/Package.resolved') }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{ matrix.xcode }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-
+            - name: Resolve dependencies
+              if: steps.cache-resolved-dependencies.outputs.cache-hit != 'true'
+              run: ${{ env.swift_package_resolve }}
+            - name: Build
+              run: ${{ env.swift_build }}
+            - name: Test
+              run: ${{ env.swift_test }}
+            - name: Scan
+              run: ${{ env.periphery_scan }} --strict
+    linux:
+        strategy:
+            fail-fast: false
+            matrix:
+                swift: ["5.5", "5.4", "5.3"]
+                include:
+                    - swift: "5.5"
+                      container: "swift:5.5"
+                      cache-version: 2
+                    - swift: "5.4"
+                      container: "swift:5.4"
+                      cache-version: 2
+                    - swift: "5.3"
+                      container: "swift:5.3"
+                      cache-version: 1
+        runs-on: ubuntu-20.04
+        container: ${{ matrix.container }}
+        name: Linux
+        steps:
+            - name: Get Swift Version
+              id: get-swift-version
+              run: |
+                  echo "::set-output name=version::$(swift -version | head -n 1 | sed s/,// )"
+              shell: bash
+            - uses: actions/checkout@master
+            - name: Cache resolved dependencies
+              id: cache-resolved-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      .build
+                      Package.resolved
+                  key: ${{ matrix.cache-version }}-${{ runner.os }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-${{ hashFiles('**/Package.swift', '**/Package.resolved') }}
+                  restore-keys: |
+                      ${{ matrix.cache-version }}-${{ runner.os }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-
+            - name: Resolve dependencies
+              if: steps.cache-resolved-dependencies.outputs.cache-hit != 'true'
+              run: ${{ env.swift_package_resolve }}
+            - name: Build
+              run: ${{ env.swift_build }} --enable-test-discovery
+            - name: Test
+              run: ${{ env.swift_test }} --enable-test-discovery
+            - name: Scan
+              run: ${{ env.periphery_scan }} --config .periphery.linux.yml
