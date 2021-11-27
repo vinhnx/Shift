@@ -3,11 +3,20 @@
 
 ---
 
+[![Swift](https://github.com/vinhnx/Shift/actions/workflows/swift.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/swift.yml)
+
 Shift is a light-weight concurrency wrapper for EventKit:
 + SwiftUI supported
 + Concurrency ready with async/await. (tag: `0.7.0`)
 + Result completion handler (tag: `0.6.0`)
 + Thread-safe.
+
+### Requirement
+
++ iOS 15.0 for async/await, tag `0.7.0`
++ iOS 14.0 and below for Result-based, tag <`0.6.0`
++ Swift version 5.5
++ Xcode 13.1
 
 ### Install
 
@@ -27,13 +36,6 @@ This component is built using Swift Package Manager, it is pretty straight forwa
 Concurrency support is now ready, in tag [`0.7.0`](https://github.com/vinhnx/Shift/releases/tag/0.7.0)
 
 In order to use old Result-based completion hanlders, please use tag [`0.6.0`](https://github.com/vinhnx/Shift/releases/tag/0.6.0).
-
-### Requirement
-
-+ iOS version 15 for async/await, tag `0.7.0`
-+ iOS version 14 and below for Result-based, tag <`0.6.0`
-+ Swift version 5.5
-+ Xcode 13
 
 ### Getting Started
 
