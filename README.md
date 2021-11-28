@@ -3,7 +3,7 @@
 
 ---
 
-[![Swift](https://github.com/vinhnx/Shift/actions/workflows/swift.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/swift.yml)
+[![Swift](https://github.com/vinhnx/Shift/actions/workflows/ci.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/ci.yml)
 
 Shift is a light-weight concurrency wrapper for EventKit:
 + SwiftUI supported
