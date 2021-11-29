@@ -6,10 +6,10 @@
 [![Swift](https://github.com/vinhnx/Shift/actions/workflows/ci.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/ci.yml)
 
 Shift is a light-weight concurrency wrapper for EventKit:
-+ SwiftUI supported
-+ Concurrency ready with async/await. (tag: `0.7.0`)
-+ Result completion handler (tag: `0.6.0`)
++ Concurrency ready with `async`/`await`. (tag: `0.7.0`)
++ Tranditional, [`Result`](https://developer.apple.com/documentation/swift/result) completion handler if preferred (tag: `0.6.0`)
 + Thread-safe.
++ SwiftUI supported.
 
 ### Requirement
 
@@ -39,19 +39,20 @@ In order to use old Result-based completion hanlders, please use tag [`0.6.0`](h
 
 ### Getting Started
 
-**First thing first**: Add Calendar usage description to your app's Info.plist to request for user's Calendars access.
+**First thing first**: 
+
++ Add Calendar usage description to your app's Info.plist to request for user's Calendars access.
 
 ```
 <key>NSCalendarsUsageDescription</key>
 	<string>&quot;$(PRODUCT_NAME) needs your permission to create events&quot;</string>
 ```
 
-(Optional) configure own calendar name to request access to, preferrable in `AppDelegate` (Swift) or `App` (SwiftUI):
++ (Optional) configure own calendar name to request access to, preferrable in `AppDelegate`'s `didFinishLaunchingWithOptions` (Swift) or `App`'s `init()` (SwiftUI):
 
 Swift AppDelegate:
 
 ```swift
-
 import UIKit
 
 @UIApplicationMain
@@ -64,7 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-SwiftUI App:
+in SwiftUI App, first `import Shift`, then configure your app's name to differntiate the name of your app's calendar in system's EventKit.
 
 ```swift
 import SwiftUI
@@ -86,42 +87,110 @@ struct MyApp: App {
 
 ---
 
-### Usage Example
+### A quick NOTE about concurrency 
 
-Fetch Events:
+`async` functions can only be called on concurrency context. 
+Otherwise, if you can `async` function inside synchornouse context, you will get error:
 
-#### async/await
+<img width="742" alt="Screen Shot 2021-11-29 at 11 35 39" src="https://user-images.githubusercontent.com/1097578/143809680-19252608-d1e5-4754-995d-67bcb5df144d.png">
 
+So, there are two ways to `await`ing for concurrency result, base on context:
++ Inside `async` function
 ```swift
-do {
-    let events = try await Shift.shared.fetchEvents(for: Date()) // await for events fetching
-} catch {
-    print(error) // handle error
+func doSomethingAsync() async {
+    // ... other works
+    let events = try? await Shift.shared.fetchEvents(for: Date())
+    // ... other works
 }
 ```
 
-or, you can ignore event, like so:
++ Inside `Task` closure:
 ```swift
-let events = try? await Shift.shared.fetchEvents(for: Date()) // await for events fetching
+func regularFunction() {
+    // ... other works
+
+    Task {
+        let events = try? await Shift.shared.fetchEvents(for: Date())
+        // then...
+    }
+
+    // ... other works
+}
 ```
 
-#### Result
+Either is fine, base on caller's context. 
+
+> You can read more about Task here https://developer.apple.com/documentation/swift/task.
+
+In SwiftUI views, you can call function inside View' `.task` modifier:
+```swift
+import EventKit
+import SwiftUI
+import Shift
+
+struct ContentView: View {
+    @StateObject var eventKitWrapper = Shift.shared
+    @State private var selectedEvent: EKEvent?
+
+    var body: some View {
+        LazyVStack(alignment: .leading, spacing: 10) {
+            ForEach(eventKitWrapper.events, id: \.self) { event in
+                Text(event: event)
+            }
+        }
+        .padding()
+        .task { // wrap async call inside .task modifier
+            try? await eventKitWrapper.fetchEventsForToday() 
+        }
+    }
+}
+```
+
+> You can read more about SwiftUI's `.task` modifier here https://developer.apple.com/documentation/swiftui/view/task(priority:_:).
+
+---
+
+### Usage Example
+
+Fetch list of events for a particular date:
+
+#### async/await (NEW)
+
+inside regular async function:
+```swift
+func fetchEvents() async {
+    do {
+        let events = try await Shift.shared.fetchEvents(for: Date()) // await for events fetching
+    } catch {
+        print(error) // handle error
+    }
+}
+```
+
+or standalone:
+```swift
+Task {
+    let events = try? await Shift.shared.fetchEvents(for: Date()) // await for events fetching
+}
+```
+
+#### Result-based completion handlers (old pattern, but still doable if you preferred this to async/await)
 
 ```swift
 Shift.shared.fetchEvents(for: Date()) { result in
-	switch result {
-	case let .success(events): print(events) // got events
-	case let .failure(error): print(error) // handle error
-	}
+    switch result {
+    case let .success(events): print(events) // got events
+    case let .failure(error): print(error) // handle error
+    }
 }
 ```
 
 ```swift
 Shift.shared.fetchEventsRangeUntilEndOfDay(from: Date()) { result in
     switch result {
-	case let .success(events): print(events) // got events
-	case let .failure(error): print(error) // handle error
-	}
+    case let .success(events): print(events) // got events
+    case let .failure(error): print(error) // handle error
+    }
 }
 ```
 
@@ -131,18 +200,28 @@ Create Event:
 
 #### async/await
 
+inside regular async function:
 ```swift
-try? await Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime)
+func myAsyncFunction() async {
+    try? await Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime)
+}
+```
+
+or standalone:
+```swift
+Task {
+    try? await Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime)
+}
 ```
 
 #### Result
 
 ```swift
 Shift.shared.createEvent("Be happy!", startDate: startTime, endDate: endTime) { result in
-	switch result {
-	case let .success(event): print(event) // created event
-	case let .failure(error): print(error) // handle error
-	}
+    switch result {
+    case let .success(event): print(event) // created event
+    case let .failure(error): print(error) // handle error
+    }
 }
 ```
 
@@ -152,18 +231,28 @@ Delete event:
 
 #### async/await
 
+inside regular async function:
 ```swift
-try? await Shift.shared.deleteEvent(identifier: eventID)
+func myAsyncFunction() async {
+    try? await Shift.shared.deleteEvent(identifier: eventID)
+}
+```
+
+or standalone:
+```swift
+Task {
+    try? await Shift.shared.deleteEvent(identifier: eventID)
+}
 ```
 
 ### Result
 
 ```swift
 Shift.shared.deleteEvent(identifier: eventID) { result in
-	switch result {
-	case let .success: print("done!") // deleted event
-	case let .failure(error): print(error) // handle error
-	}
+    switch result {
+    case let .success: print("done!") // deleted event
+    case let .failure(error): print(error) // handle error
+    }
 }
 ```
 
@@ -191,7 +280,9 @@ struct ContentView: View {
             }
         }
         .padding()
-        .onAppear { eventKitWrapper.fetchEventsForToday() }
+        .onAppear {
+            eventKitWrapper.fetchEventsForToday()
+        }
     }
 }
 ```
@@ -214,7 +305,7 @@ struct ContentView: View {
             }
         }
         .padding()
-        .task { 
+        .task {
             try? await eventKitWrapper.fetchEventsForToday() 
         }
     }
