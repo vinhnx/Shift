@@ -166,7 +166,8 @@ public final class Shift: ObservableObject {
         let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
         let events = self.eventStore.events(matching: predicate)
 
-        DispatchQueue.main.async {
+        // MainActor is a type that runs code on main thread.
+        await MainActor.run {
             self.events = events
         }
 
