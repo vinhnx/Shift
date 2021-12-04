@@ -31,13 +31,11 @@ public enum ShiftError: Error, LocalizedError {
 }
 
 /// Swift wrapper for EventKit
-/// actor: protected against un-safe thread accessing
-public actor Shift: ObservableObject {
+public final class Shift: ObservableObject {
 
     // MARK: - Properties
 
-    /// Events should only be accessible from main thread
-    @Published @MainActor public var events = [EKEvent]()
+    @Published public var events = [EKEvent]()
 
     public static var appName: String?
 
