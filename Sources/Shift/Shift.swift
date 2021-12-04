@@ -7,6 +7,7 @@
 import Foundation
 import SwiftUI
 import EventKit
+import Algorithms
 
 /// ShiftError definition
 public enum ShiftError: Error, LocalizedError {
@@ -164,7 +165,9 @@ public final class Shift: ObservableObject {
         }
 
         let predicate = self.eventStore.predicateForEvents(withStart: startDate, end: endDate, calendars: calendars)
-        let events = self.eventStore.events(matching: predicate)
+        let events = self.eventStore
+            .events(matching: predicate)
+            .uniqued(on: \.eventIdentifier) // filter duplicated events
 
         // MainActor is a type that runs code on main thread.
         await MainActor.run {
