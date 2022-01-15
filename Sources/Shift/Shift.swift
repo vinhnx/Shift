@@ -36,8 +36,10 @@ public final class Shift: ObservableObject {
 
     // MARK: - Properties
 
+    /// Streams of EKEvent instances
     @Published public var events = [EKEvent]()
 
+    /// The calendar’s title.
     public static var appName: String?
 
     /// Event store: An object that accesses the user’s calendar and reminder events and supports the scheduling of new events.
@@ -50,8 +52,11 @@ public final class Shift: ObservableObject {
 
     // MARK: Lifecycle
 
+    /// Shared `Shift` singleton
     public static let shared = Shift()
 
+    /// Configuration point
+    /// - Parameter appName: the calendar's title
     public static func configureWithAppName(_ appName: String) {
         self.appName = appName
     }
@@ -115,11 +120,13 @@ public final class Shift: ObservableObject {
     /// Fetch events for today
     /// - Parameter completion: completion handler
     /// - Parameter filterCalendarIDs: filterable Calendar IDs
-    /// Returns: events for today
     @discardableResult
-    public func fetchEventsForToday(filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
+    public func fetchEventsForToday(
+        filterCalendarIDs: [String] = [],
+        calendar: Calendar = .autoupdatingCurrent
+    ) async throws -> [EKEvent] {
         let today = Date()
-        return try await fetchEvents(startDate: today.startOfDay, endDate: today.endOfDay, filterCalendarIDs: filterCalendarIDs)
+        return try await fetchEvents(startDate: today.startOfDay(calendar: calendar), endDate: today.endOfDay(calendar: calendar), filterCalendarIDs: filterCalendarIDs)
     }
 
     /// Fetch events for a specific day
@@ -129,8 +136,12 @@ public final class Shift: ObservableObject {
     ///   - filterCalendarIDs: filterable Calendar IDs
     /// Returns: events
     @discardableResult
-    public func fetchEvents(for date: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
-        try await fetchEvents(startDate: date.startOfDay, endDate: date.endOfDay, filterCalendarIDs: filterCalendarIDs)
+    public func fetchEvents(
+        for date: Date,
+        filterCalendarIDs: [String] = [],
+        calendar: Calendar = .autoupdatingCurrent
+    ) async throws -> [EKEvent] {
+        try await fetchEvents(startDate: date.startOfDay(calendar: calendar), endDate: date.endOfDay(calendar: calendar), filterCalendarIDs: filterCalendarIDs)
     }
 
     /// Fetch events for a specific day
@@ -141,8 +152,12 @@ public final class Shift: ObservableObject {
     ///   - filterCalendarIDs: filterable Calendar IDs
     /// Returns: events
     @discardableResult
-    public func fetchEventsRangeUntilEndOfDay(from startDate: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
-        try await fetchEvents(startDate: startDate, endDate: startDate.endOfDay, filterCalendarIDs: filterCalendarIDs)
+    public func fetchEventsRangeUntilEndOfDay(
+        from startDate: Date,
+        filterCalendarIDs: [String] = [],
+        calendar: Calendar = .autoupdatingCurrent
+    ) async throws -> [EKEvent] {
+        try await fetchEvents(startDate: startDate, endDate: startDate.endOfDay(calendar: calendar), filterCalendarIDs: filterCalendarIDs)
     }
 
     /// Fetch events from date range
@@ -153,7 +168,11 @@ public final class Shift: ObservableObject {
     ///   - filterCalendarIDs: filterable Calendar IDs
     /// Returns: events
     @discardableResult
-    public func fetchEvents(startDate: Date, endDate: Date, filterCalendarIDs: [String] = []) async throws -> [EKEvent] {
+    public func fetchEvents(
+        startDate: Date,
+        endDate: Date,
+        filterCalendarIDs: [String] = []
+    ) async throws -> [EKEvent] {
         let authorization = try await requestEventStoreAuthorization()
         guard authorization == .authorized else {
             throw ShiftError.eventAuthorizationStatus(nil)
@@ -292,15 +311,15 @@ extension EKEventStore {
 }
 
 extension Date {
-    var startOfDay: Date {
-        Calendar.current.startOfDay(for: self)
+    func startOfDay(calendar: Calendar = .autoupdatingCurrent) -> Date {
+        calendar.startOfDay(for: self)
     }
 
-    var endOfDay: Date {
+    func endOfDay(calendar: Calendar = .autoupdatingCurrent) -> Date {
         var components = DateComponents()
         components.day = 1
         components.second = -1
         // swiftlint:disable:next force_unwrapping
-        return Calendar.current.date(byAdding: components, to: startOfDay)!
+        return calendar.date(byAdding: components, to: startOfDay(calendar: calendar))!
     }
 }
