@@ -93,10 +93,17 @@ public final class Shift: ObservableObject {
         startDate: Date,
         endDate: Date?,
         span: EKSpan = .thisEvent,
-        isAllDay: Bool = false
+        isAllDay: Bool = false,
+        calendar: EKCalendar? = nil
     ) async throws -> EKEvent {
-        let calendar = try await accessCalendar()
-        let createdEvent = try await self.eventStore.createEvent(title: title, startDate: startDate, endDate: endDate, calendar: calendar, span: span, isAllDay: isAllDay)
+        var theCalendar: EKCalendar
+        if let calendar = calendar {
+            theCalendar = calendar
+        } else {
+            theCalendar = try await accessCalendar()
+        }
+
+        let createdEvent = try await self.eventStore.createEvent(title: title, startDate: startDate, endDate: endDate, calendar: theCalendar, span: span, isAllDay: isAllDay)
         return createdEvent
     }
 #endif
