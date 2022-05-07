@@ -89,8 +89,7 @@ struct MyApp: App {
 
 ### A quick NOTE about concurrency 
 
-`async` functions can only be called on concurrency context. 
-Otherwise, if you can `async` function inside synchornouse context, you will get error:
+Since `async` functions can only be called on concurrency context, if you call `async` function inside synchornouse context, Xcode will throws an error:
 
 <img width="742" alt="Screen Shot 2021-11-29 at 11 35 39" src="https://user-images.githubusercontent.com/1097578/143809680-19252608-d1e5-4754-995d-67bcb5df144d.png">
 
