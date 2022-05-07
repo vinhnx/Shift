@@ -121,7 +121,7 @@ Either is fine, base on caller's context.
 
 > You can read more about Task here https://developer.apple.com/documentation/swift/task.
 
-In SwiftUI views, you can call function inside View' `.task` modifier:
+In SwiftUI views, you can call `async` functions inside View' `.task` modifier:
 ```swift
 import EventKit
 import SwiftUI
