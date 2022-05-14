@@ -5,7 +5,7 @@
 
 [![Swift](https://github.com/vinhnx/Shift/actions/workflows/ci.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/ci.yml)
 
-Shift is a light-weight concurrency wrapper for EventKit:
+Shift is a light-weight concurrency wrapper for [EventKit](https://developer.apple.com/documentation/eventkit):
 + Concurrency ready with `async`/`await`. (tag: `0.7.0`)
 + Tranditional, [`Result`](https://developer.apple.com/documentation/swift/result) completion handler if preferred (tag: `0.6.0`)
 + Thread-safe.
