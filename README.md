@@ -11,6 +11,8 @@ Shift is a light-weight concurrency wrapper for [EventKit](https://developer.app
 + Thread-safe.
 + SwiftUI supported.
 
+Shift is currently being used by [Clendar](https://github.com/vinhnx/Clendar) app.
+
 ### Requirement
 
 + iOS 15.0 for async/await, tag `0.7.0`
