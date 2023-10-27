@@ -223,7 +223,11 @@ public final class Shift: ObservableObject {
     }
 
     private func requestCalendarAccess() async throws -> Bool {
-        try await eventStore.requestAccess(to: .event)
+        if #available(iOS 17, *) {
+            try await eventStore.requestFullAccessToEvents()
+        } else {
+            try await eventStore.requestAccess(to: .event)
+        }
     }
 }
 
