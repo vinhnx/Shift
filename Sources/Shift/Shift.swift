@@ -9,6 +9,8 @@ import SwiftUI
 import EventKit
 import Algorithms
 
+typealias RequestAccessCompletion = ((Bool, Error?) -> Void)
+
 /// ShiftError definition
 public enum ShiftError: Error, LocalizedError {
     case mapFromError(Error)
@@ -222,13 +224,26 @@ public final class Shift: ObservableObject {
         return calendar
     }
 
+
     private func requestCalendarAccess() async throws -> Bool {
-        if #available(iOS 17, *) {
-            try await eventStore.requestFullAccessToEvents()
-        } else {
-            try await eventStore.requestAccess(to: .event)
+        try await withCheckedThrowingContinuation { [weak self] continuation in
+            guard let self else { return }
+            let completion: RequestAccessCompletion = { granted, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: granted)
+                }
+            }
+
+            if #available(iOS 17.0, *) {
+                self.eventStore.requestFullAccessToEvents(completion: completion)
+            } else {
+                self.eventStore.requestAccess(to: .event, completion: completion)
+            }
         }
     }
+
 }
 
 extension EKEventStore {
