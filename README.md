@@ -4,6 +4,8 @@
 ---
 
 [![Swift](https://github.com/vinhnx/Shift/actions/workflows/ci.yml/badge.svg)](https://github.com/vinhnx/Shift/actions/workflows/ci.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvinhnx%2FShift%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/vinhnx/Shift)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fvinhnx%2FShift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/vinhnx/Shift)
 
 Shift is a light-weight concurrency wrapper for [EventKit](https://developer.apple.com/documentation/eventkit):
 + Concurrency ready with `async`/`await`. (tag: `0.7.0`)
